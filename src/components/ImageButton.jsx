@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const ProductButton = styled.div`
-  width: calc(25% - 40px);
+  width: 100%;
   height: auto;
   border-radius: 8px;
   cursor: pointer;
@@ -9,32 +9,29 @@ const ProductButton = styled.div`
   flex-direction: column;
 
   img {
-    width: 100%;
-    max-width: 480px;
-    height: auto;
+    width: 300px;
+    height: 210px;
+    object-fit: cover;
     border-radius: 8px;
-  }
-
-  p {
-    width: 320px;
-    color: gray;
-    margin-top: 10px;
-    font-size: 15px;
-  }
-
-  div {
-    width: 320px;
-    margin-top: 10px;
-    font-size: 30px;
+    @media (min-width: 1501px) and (max-width: 1920px) {
+      width: 300px;
+      height: 210px;
+    }
+    @media (min-width: 835px) and (max-width: 1500px) {
+      width: 200px;
+      height: 140px;
+    }
+    @media (min-width: 360px) and (max-width: 834px) {
+      width: 100px;
+      height: 70px;
+    }
   }
 `;
 
-const ImageButton = ({ image, name, info }) => {
+const ImageButton = ({ image }) => {
   return (
     <ProductButton>
-      <img src={image} alt={name} />
-      <div>{name}</div>
-      <p>{info}</p>
+      <img src={image} />
     </ProductButton>
   );
 };
