@@ -1,8 +1,13 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { atom, useAtom } from "jotai";
+import { isLoginAtom } from "../atom";
 
+const searchQueryAtom = atom("");
+const userProfilePicAtom = atom(null);
 const Headercss = styled.div`
+  z-index: 1;
   border-radius: 10px;
   display: flex;
   position: fixed;
@@ -22,71 +27,174 @@ const Container = styled.div`
   gap: 20px;
 `;
 
-const CodeReview = styled.div`
-  font-size: 24px;
-`;
-
 const UserLogo = styled.img`
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background-color: gray;
+  cursor: pointer;
 `;
 
 const Logo = styled.img`
   width: 50px;
-  height: 50px;
   border-radius: 50%;
-  background-color: gray;
+  background-color: white;
+  cursor: pointer;
+`;
+const Logo2 = styled.img`
+  width: 10rem;
+  background-color: white;
+  cursor: pointer;
 `;
 
 const Button = styled(Link)`
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(220, 220, 220);
-  width: auto;
-  height: auto;
-  padding: 8px 24px;
-  border-radius: 20px;
-  font-size: 15px;
+    text-decoration: none;
+    display: flex;
+    background-color: rgb(220, 220, 220);
+    align-items: center;
+    width: auto;
+    height: auto;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 15px;
+    color:black;
+    }
 
-  &:visited {
-    color: black;
-  }
+  `;
+const AuthButton = styled(Link)`
+    text-decoration: none;
+    display: flex;
+    background-color: ${(props) =>
+      props.selected ? "black" : "rgb(250,250,250)"};
+    color: ${(props) => (props.selected ? "white" : "black")};
+    align-items: center;
+    width: auto;
+    height: auto;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 15px;
+    }
 
-  &:active {
-    color: black;
-  }
-`;
+
+  `;
 
 const Input = styled.input`
-  width: 280px;
+  width: 40vw;
+  height: 40px;
+  background-color: #f0f0f0;
+  color: #000000;
+  border-radius: 20px;
+  border: 1px solid #e4e4e4;
+  padding-left: 12px;
+  outline: none;
 `;
 
 const Header = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useAtom(isLoginAtom);
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
+  const [userProfilePic, setUserProfilePic] = useAtom(userProfilePicAtom);
+  const navigate = useNavigate();
 
-  const loginComponent = () => {
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setIsLogin(true);
+      const fetchProfileimg = async () => {
+        try {
+          const response = await fetch("api/user/pic", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          setUserProfilePic(data.profilePicUrl);
+        } catch (error) {
+          console.error("프로필 사진을 가져오는 데 실패했습니다.", error);
+        }
+      };
+      fetchProfileimg();
+    } else {
+      setIsLogin(false);
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("authToken");
     setIsLogin(false);
+    setUserProfilePic(null);
   };
+
+  const handleSearch = (event) => {
+    if (event.key === "Enter") {
+      navigate(`/search?query=${searchQuery}`);
+    }
+  };
+
+  const Auththings = [
+    { name: "Login", link: "/login" },
+    { name: "Signup", link: "/signup" },
+  ];
+
   return (
     <Headercss>
       <Container>
-        <Logo src="/example.png" alt="logo" />
-        <CodeReview>CodeReview</CodeReview>
+        <Logo
+          src="CodeReviewLogo.png"
+          alt="logo"
+          onClick={() => {
+            navigate("/");
+          }}
+        />
+        <Logo2
+          src="CodeReview.png"
+          alt="logo2"
+          onClick={() => {
+            navigate("/");
+          }}
+        />
+        <Input
+          placeholder="듣고싶은 강의를 검색해보세요."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleSearch}
+        />
       </Container>
       {isLogin ? (
         <Container>
-          <Input placeholder="Search in Site"></Input>
-          <Button to={"/"} onClick={loginComponent}>
-            로그아웃
+          <Button to={"/"} onClick={logout}>
+            Logout
           </Button>
-          <UserLogo src="/example.png" alt="Userlogo" />
+          {userProfilePic ? (
+            <UserLogo
+              onClick={() => {
+                navigate("/users");
+              }}
+              src={userProfilePic}
+              alt="프로필"
+            />
+          ) : (
+            <UserLogo
+              onClick={() => {
+                navigate("/users");
+              }}
+              src="example.png"
+              alt="프로필 오류!"
+            />
+          )}
         </Container>
       ) : (
-        <Button to={"/login"}>로그인/회원가입</Button>
+        <Container>
+          {Auththings.map((cat) => (
+            <AuthButton
+              key={cat.name}
+              to={cat.link}
+              selected={location.pathname === cat.link}
+            >
+              {cat.name}
+            </AuthButton>
+          ))}
+        </Container>
       )}
     </Headercss>
   );
