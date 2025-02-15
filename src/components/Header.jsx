@@ -2,8 +2,8 @@ import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { atom, useAtom } from "jotai";
+import { isLoginAtom } from "../atom";
 
-const isLoginAtom = atom(false);
 const searchQueryAtom = atom("");
 const userProfilePicAtom = atom(null);
 const Headercss = styled.div`
@@ -61,33 +61,20 @@ const Button = styled(Link)`
     }
 
   `;
-const LoginButton = styled(Link)`
+const AuthButton = styled(Link)`
     text-decoration: none;
     display: flex;
-    background-color: rgb(30, 30, 30);
+    background-color: ${(props) =>
+      props.selected ? "black" : "rgb(250,250,250)"};
+    color: ${(props) => (props.selected ? "white" : "black")};
     align-items: center;
     width: auto;
     height: auto;
     padding: 8px 24px;
     border-radius: 20px;
     font-size: 15px;
-    color:white;
     }
 
-
-  `;
-const SignupButton = styled(Link)`
-    text-decoration: none;
-    display: flex;
-    background-color: rgb(220, 220, 220);
-    align-items: center;
-    width: auto;
-    height: auto;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 15px;
-    color: black;
-    }
 
   `;
 
@@ -109,7 +96,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken");
     if (token) {
       setIsLogin(true);
       const fetchProfileimg = async () => {
@@ -132,16 +119,22 @@ const Header = () => {
     }
   }, []);
 
-  const loginComponent = () => {
-    sessionStorage.removeItem("authToken");
+  const logout = () => {
+    localStorage.removeItem("authToken");
     setIsLogin(false);
+    setUserProfilePic(null);
   };
 
-  const handleSearch = () => {
+  const handleSearch = (event) => {
     if (event.key === "Enter") {
       navigate(`/search?query=${searchQuery}`);
     }
   };
+
+  const Auththings = [
+    { name: "Login", link: "/login" },
+    { name: "Signup", link: "/signup" },
+  ];
 
   return (
     <Headercss>
@@ -169,7 +162,7 @@ const Header = () => {
       </Container>
       {isLogin ? (
         <Container>
-          <Button to={"/"} onClick={loginComponent}>
+          <Button to={"/"} onClick={logout}>
             Logout
           </Button>
           {userProfilePic ? (
@@ -192,12 +185,15 @@ const Header = () => {
         </Container>
       ) : (
         <Container>
-          <LoginButton to={"/login"} className="login">
-            Login
-          </LoginButton>
-          <SignupButton to={"/signup"} className="signup">
-            Signup
-          </SignupButton>
+          {Auththings.map((cat) => (
+            <AuthButton
+              key={cat.name}
+              to={cat.link}
+              selected={location.pathname === cat.link}
+            >
+              {cat.name}
+            </AuthButton>
+          ))}
         </Container>
       )}
     </Headercss>
