@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { isLoginAtom } from "../atom";
 import Header from "../components/Header.jsx";
@@ -12,6 +12,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/332505/cover/c32e770b-b417-436d-afd0-e2285ac6e514/332505.png?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "개발, 프로그래밍",
+    instructor: "김영한",
   },
   {
     id: "2",
@@ -20,6 +21,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/324145/cover/184a19f3-c99f-4eea-a764-dc8e71d4c37a/324145.png?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "개발, 프로그래밍",
+    instructor: "inflearn",
   },
   {
     id: "3",
@@ -28,6 +30,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/331168/cover/dcdd44f3-2082-42dd-8d93-a8ee27773b28/%5B%E1%84%8C%E1%85%A6%E1%84%8F%E1%85%A9%E1%84%87%E1%85%A2%5D+%E1%84%8B%E1%85%A1%E1%84%82%E1%85%B3%E1%86%AB+%E1%84%86%E1%85%A1%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%B7+%E1%84%87%E1%85%A9%E1%84%8B%E1%85%B5%E1%84%82%E1%85%B3%E1%86%AB+%E1%84%8F%E1%85%B3%E1%84%85%E1%85%A9%E1%86%B7+%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%E1%84%8C%E1%85%A1+%E1%84%83%E1%85%A9%E1%84%80%E1%85%AE.png?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "개발, 프로그래밍",
+    instructor: "inflearn",
   },
   {
     id: "4",
@@ -36,6 +39,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/335777/cover/10a750c9-2f5d-440b-b5f4-c8ab15b0bdf6/335777.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "개발, 프로그래밍",
+    instructor: "inflearn",
   },
   {
     id: "5",
@@ -44,6 +48,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/331419/cover/25cd4324-bcf1-48f7-9797-ef17ad32a80d/PPT%20design%20by%20a%20high-performer%20who%20gets%20things%20done%20in%20one%20go.png?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "데이터 사이언스",
+    instructor: "inflearn",
   },
   {
     id: "6",
@@ -52,6 +57,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/331923/cover/b83e249f-097b-4192-a038-2af3e387d527/331923-eng.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "게임 개발",
+    instructor: "inflearn",
   },
   {
     id: "7",
@@ -60,6 +66,7 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/334233/cover/fabf51c0-16ab-4d1c-82ea-00d548287a8e/334233.png?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "개발, 프로그래밍",
+    instructor: "inflearn",
   },
   {
     id: "8",
@@ -68,23 +75,8 @@ const courses = [
       "https://cdn.inflearn.com/public/courses/335776/cover/fc71c9d3-40dd-4c07-b534-f859f35d45b6/335776.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
     category: "데이터 사이언스",
+    instructor: "inflearn",
   },
-];
-
-const RecommandCourses = [
-  { id: "1", name: "강의1" },
-  { id: "2", name: "강의2" },
-  { id: "3", name: "강의3" },
-  { id: "4", name: "강의4" },
-  { id: "5", name: "강의5" },
-];
-
-const AD = [
-  { id: "1", name: "광고1" },
-  { id: "2", name: "광고2" },
-  { id: "3", name: "광고3" },
-  { id: "4", name: "광고4" },
-  { id: "5", name: "광고5" },
 ];
 
 const Br = styled.div`
@@ -226,6 +218,14 @@ const Info = styled.a`
   text-decoration: none;
 `;
 
+const Instruct = styled.a`
+  display: flex;
+  padding-top: 10px;
+  color: gray;
+  font-size: 20px;
+  text-decoration: none;
+`;
+
 const RecFeed = styled.div`
   font-size: 30px;
   align-item: center;
@@ -290,11 +290,12 @@ const RecAD = styled.div`
     display: none;
   }
 `;
-const RecThings = styled.div`
+const RecThings = styled.img`
   display: flex;
   gap: 40px;
   width: 480px;
   height: 400px;
+  object-fit: cover;
   background-color: rgb(220, 220, 220);
   flex-shrink: 0;
 `;
@@ -312,7 +313,7 @@ const NeedLogin = styled.div`
   gap: 6px;
 `;
 
-const LoginButton = styled.button`
+const SignupButton = styled.button`
   margin-top: 16px;
   background-color: black;
   color: white;
@@ -320,11 +321,57 @@ const LoginButton = styled.button`
   height: 64px;
   border-radius: 8px;
   font-size: 16px;
+  cursor: pointer;
+`;
+const LoginButton = styled.button`
+  margin-top: 16px;
+  background-color: white;
+  color: black;
+  width: 380px;
+  height: 64px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 `;
 
 const Home = () => {
   const [isLogin] = useAtom(isLoginAtom);
   const [category, setCategory] = useState("ALL");
+  const [ads, setAds] = useState([]);
+  const [recommandCourses, setRecommandCourses] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch(
+          "https://api.unsplash.com/photos?client_id=800hGr_695fPo_zAhHXStRFpytHVdjj4X2b5us6zbqI&per_page=5"
+        );
+        const data = await response.json();
+        setAds(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("오류:", { error });
+      }
+    };
+    fetchAds();
+  }, []);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch(
+          "https://api.unsplash.com/photos?client_id=800hGr_695fPo_zAhHXStRFpytHVdjj4X2b5us6zbqI&per_page=5"
+        );
+        const data = await response.json();
+        setRecommandCourses(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("오류:", { error });
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
@@ -380,6 +427,7 @@ const Home = () => {
             <div key={course.id}>
               <ImageButton {...course} />
               <Info href={course.link}>{course.name}</Info>
+              <Instruct>{course.instructor}</Instruct>
             </div>
           ))}
         </Course>
@@ -387,13 +435,13 @@ const Home = () => {
       {isLogin ? (
         <RecFeed>
           <RecCourse>
-            {RecommandCourses.map((cat) => (
-              <RecThings key={cat.id}>{cat.name}</RecThings>
+            {recommandCourses.map((cat) => (
+              <RecThings key={cat.id} src={cat.urls.regular} />
             ))}
           </RecCourse>
           <RecAD>
-            {AD.map((cat) => (
-              <RecThings key={cat.id}>{cat.name}</RecThings>
+            {ads.map((cat) => (
+              <RecThings key={cat.id} src={cat.urls.regular} />
             ))}
           </RecAD>
         </RecFeed>
@@ -402,12 +450,19 @@ const Home = () => {
           <NeedLogin>
             <div>회원이 되면</div>
             <div>더 많은 기능을 확인할 수 있어요!</div>
+            <SignupButton
+              onClick={() => {
+                window.location.href = "/signup";
+              }}
+            >
+              회원가입
+            </SignupButton>
             <LoginButton
               onClick={() => {
                 window.location.href = "/login";
               }}
             >
-              로그인
+              로그인하기
             </LoginButton>
           </NeedLogin>
         </>
