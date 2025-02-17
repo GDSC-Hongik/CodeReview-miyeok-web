@@ -9,29 +9,22 @@ const ProductButton = styled.div`
   flex-direction: column;
 
   img {
-    width: 300px;
-    height: 210px;
+    width: 100%;
+    height: calc(width * 0.7);
     object-fit: cover;
     border-radius: 8px;
-    @media (min-width: 1501px) and (max-width: 1920px) {
-      width: 300px;
-      height: 210px;
-    }
-    @media (min-width: 835px) and (max-width: 1500px) {
-      width: 200px;
-      height: 140px;
-    }
-    @media (min-width: 360px) and (max-width: 834px) {
-      width: 100px;
-      height: 70px;
-    }
   }
 `;
 
-const ImageButton = ({ image }) => {
+const ImageButton = ({ image, link }) => {
   return (
     <ProductButton>
-      <img src={image} />
+      <img
+        src={image}
+        onClick={() => {
+          window.location.href = link;
+        }}
+      />
     </ProductButton>
   );
 };
