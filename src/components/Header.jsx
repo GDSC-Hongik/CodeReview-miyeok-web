@@ -48,19 +48,22 @@ const Logo2 = styled.img`
 `;
 
 const Button = styled(Link)`
-    text-decoration: none;
-    display: flex;
-    background-color: rgb(220, 220, 220);
-    align-items: center;
-    width: auto;
-    height: auto;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 15px;
-    color:black;
-    }
+  text-decoration: none;
+  display: flex;
+  background-color: white;
+  align-items: center;
+  width: auto;
+  height: auto;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+  color: black;
 
-  `;
+  &:hover {
+    background-color: black;
+    color: white;
+  }
+`;
 const AuthButton = styled(Link)`
     text-decoration: none;
     display: flex;
@@ -178,7 +181,7 @@ const Header = () => {
               onClick={() => {
                 navigate("/users");
               }}
-              src="example.png"
+              src="userProfile.png"
               alt="프로필 오류!"
             />
           )}
