@@ -4,14 +4,14 @@ import { isLoginAtom } from "../atom";
 import Header from "../components/Header.jsx";
 import ImageButton from "../components/ImageButton.jsx";
 import styled from "styled-components";
-const courses = [
+const Dummycourses = [
   {
     id: "1",
     name: "김영한의 자바 입문 - 코드로 시작하는 자바 첫걸음",
     image:
       "https://cdn.inflearn.com/public/courses/332505/cover/c32e770b-b417-436d-afd0-e2285ac6e514/332505.png?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "개발, 프로그래밍",
+    category: "웹 개발",
     instructor: "김영한",
   },
   {
@@ -20,7 +20,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/324145/cover/184a19f3-c99f-4eea-a764-dc8e71d4c37a/324145.png?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "개발, 프로그래밍",
+    category: "웹 개발",
     instructor: "inflearn",
   },
   {
@@ -29,7 +29,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/331168/cover/dcdd44f3-2082-42dd-8d93-a8ee27773b28/%5B%E1%84%8C%E1%85%A6%E1%84%8F%E1%85%A9%E1%84%87%E1%85%A2%5D+%E1%84%8B%E1%85%A1%E1%84%82%E1%85%B3%E1%86%AB+%E1%84%86%E1%85%A1%E1%86%AB%E1%84%8F%E1%85%B3%E1%86%B7+%E1%84%87%E1%85%A9%E1%84%8B%E1%85%B5%E1%84%82%E1%85%B3%E1%86%AB+%E1%84%8F%E1%85%B3%E1%84%85%E1%85%A9%E1%86%B7+%E1%84%80%E1%85%A2%E1%84%87%E1%85%A1%E1%86%AF%E1%84%8C%E1%85%A1+%E1%84%83%E1%85%A9%E1%84%80%E1%85%AE.png?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "개발, 프로그래밍",
+    category: "웹 개발",
     instructor: "inflearn",
   },
   {
@@ -38,7 +38,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/335777/cover/10a750c9-2f5d-440b-b5f4-c8ab15b0bdf6/335777.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "개발, 프로그래밍",
+    category: "소프트웨어 테스트",
     instructor: "inflearn",
   },
   {
@@ -47,7 +47,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/331419/cover/25cd4324-bcf1-48f7-9797-ef17ad32a80d/PPT%20design%20by%20a%20high-performer%20who%20gets%20things%20done%20in%20one%20go.png?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "데이터 사이언스",
+    category: "데이터베이스",
     instructor: "inflearn",
   },
   {
@@ -56,7 +56,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/331923/cover/b83e249f-097b-4192-a038-2af3e387d527/331923-eng.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "게임 개발",
+    category: "모바일 개발",
     instructor: "inflearn",
   },
   {
@@ -65,7 +65,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/334233/cover/fabf51c0-16ab-4d1c-82ea-00d548287a8e/334233.png?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "개발, 프로그래밍",
+    category: "프로그래밍 언어",
     instructor: "inflearn",
   },
   {
@@ -74,7 +74,7 @@ const courses = [
     image:
       "https://cdn.inflearn.com/public/courses/335776/cover/fc71c9d3-40dd-4c07-b534-f859f35d45b6/335776.jpg?w=420",
     link: "https://github.com/Yunjanghyeon",
-    category: "데이터 사이언스",
+    category: "프로그래밍 언어",
     instructor: "inflearn",
   },
 ];
@@ -121,7 +121,7 @@ const Section = styled.div`
 
 const Product = styled.section`
   font-size: 30px;
-  align-item: center;
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   padding: 150px;
@@ -313,20 +313,10 @@ const NeedLogin = styled.div`
   gap: 6px;
 `;
 
-const SignupButton = styled.button`
+const LoginButton = styled.button`
   margin-top: 16px;
   background-color: black;
   color: white;
-  width: 380px;
-  height: 64px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-`;
-const LoginButton = styled.button`
-  margin-top: 16px;
-  background-color: white;
-  color: black;
   width: 380px;
   height: 64px;
   border-radius: 8px;
@@ -337,9 +327,24 @@ const LoginButton = styled.button`
 const Home = () => {
   const [isLogin] = useAtom(isLoginAtom);
   const [category, setCategory] = useState("ALL");
+  const [courses, setCourses] = useState([]);
   const [ads, setAds] = useState([]);
   const [recommandCourses, setRecommandCourses] = useState([]);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAllCourse = async () => {
+      try {
+        const response = await fetch("link");
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("오류:", { error });
+      }
+    };
+    fetchAllCourse();
+  }, []);
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -379,17 +384,16 @@ const Home = () => {
 
   const filteredCourses =
     category === "ALL"
-      ? courses
-      : courses.filter((course) => course.category === category);
+      ? Dummycourses // courses
+      : Dummycourses.filter((course) => course.category === category);
 
   const CategoryMap = [
     "ALL",
-    "개발, 프로그래밍",
-    "개임 개발",
-    "데이터 사이언스",
-    "인공지능",
-    "보안, 네트워크",
-    "하드웨어",
+    "웹 개발",
+    "모바일 개발",
+    "프로그래밍 언어",
+    "데이터베이스",
+    "소프트웨어 테스트",
   ];
 
   return (
@@ -423,13 +427,14 @@ const Home = () => {
           ))}
         </Category>
         <Course>
-          {filteredCourses.map((course) => (
-            <div key={course.id}>
-              <ImageButton {...course} />
-              <Info href={course.link}>{course.name}</Info>
-              <Instruct>{course.instructor}</Instruct>
+          {filteredCourses.map((Dummycourse) => (
+            <div key={Dummycourse.id}>
+              <ImageButton {...Dummycourse} />
+              <Info href={Dummycourse.link}>{Dummycourse.name}</Info>
+              <Instruct>{Dummycourse.instructor}</Instruct>
             </div>
           ))}
+          <img src="moreinfoarrow.png" />
         </Course>
       </Product>
       {isLogin ? (
@@ -450,13 +455,6 @@ const Home = () => {
           <NeedLogin>
             <div>회원이 되면</div>
             <div>더 많은 기능을 확인할 수 있어요!</div>
-            <SignupButton
-              onClick={() => {
-                window.location.href = "/signup";
-              }}
-            >
-              회원가입
-            </SignupButton>
             <LoginButton
               onClick={() => {
                 window.location.href = "/login";
@@ -464,6 +462,7 @@ const Home = () => {
             >
               로그인하기
             </LoginButton>
+            <div>{courses}</div>
           </NeedLogin>
         </>
       )}
