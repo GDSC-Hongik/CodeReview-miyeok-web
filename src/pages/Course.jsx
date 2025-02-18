@@ -1,3 +1,5 @@
+import { useAtom } from "jotai";
+import { isLoginAtom } from "../atom";
 import { useState } from "react";
 import Header from "../components/Header.jsx";
 import ReviewBox from "../components/ReviewBox.jsx";
@@ -55,8 +57,8 @@ const Lecturer = styled.div`
 `;
 
 const Platform = styled.div`
-  border: 1px solid #9ee33d;
-  background-color: #9ee33d;
+  border: 1px solid #b4f10e;
+  background-color: #b4f10e;
   border-radius: 14px;
   padding: 5px 5px;
   font-size: 14px;
@@ -200,7 +202,7 @@ const dummyReviews = [
     .fill()
     .map((_, i) => ({
       reviewer: `user${i + 1}`,
-      reviewerImage: "/example.png",
+      reviewerImage: "/userProfile.png",
       rating: Math.floor(Math.random() * 5) + 1,
       comment: `이것은 ${i + 1}번째 리뷰입니다.`,
     })),
@@ -237,7 +239,157 @@ const PageButton = styled.button`
   `}
 `;
 
+const DoReview = styled.section`
+  display: flex;
+  width: 80%;
+  margin: 10%;
+  justify-content: space-between;
+`;
+
+const DoReviewInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  h1 {
+    font-weight: bold;
+    font-size: 36px;
+  }
+`;
+
+const OnlyForUser = styled.div`
+  display: flex;
+  font-weight: bold;
+  font-size: 40px;
+  padding: 15px;
+  margin-right: 5%;
+`;
+
+const DoReviewSection = styled.div`
+  display: flex;
+  width: 55%;
+  flex-direction: column;
+  gap: 15px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: bold;
+  }
+`;
+
+const ReviewTitle = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  textarea {
+    height: 30px;
+    padding: 10px;
+    font-size: 16px;
+  }
+`;
+
+const GoodReview = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  textarea {
+    height: 100px;
+    padding: 10px;
+    font-size: 16px;
+  }
+`;
+
+const BadReview = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  textarea {
+    height: 100px;
+    padding: 10px;
+    font-size: 16px;
+  }
+`;
+
+const ReviewUploadButton = styled.button`
+  border: 1px black;
+  background-color: black;
+  color: whitesmoke;
+  height: 40px;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: lightgray;
+    color: black;
+  }
+`;
+
+const ReviewForm = () => {
+  const [review, setReview] = useState({
+    title: "",
+    good: "",
+    bad: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setReview((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("리뷰 작성 완료", review);
+    alert("리뷰가 등록되었습니다!");
+  };
+
+  return (
+    <DoReviewSection>
+      <h2>별점 매기기 만들어야함</h2>
+      <ReviewTitle>
+        <label>제목</label>
+        <input
+          type="text"
+          name="title"
+          value={review.title}
+          onChange={handleChange}
+          placeholder="제목을 입력하세요"
+        />
+      </ReviewTitle>
+      <GoodReview>
+        <label>좋은 점</label>
+        <textarea
+          name="good"
+          value={review.good}
+          onChange={handleChange}
+          placeholder="좋았던 점을 입력하세요"
+        />
+      </GoodReview>
+      <BadReview>
+        <label>아쉬운 점</label>
+        <textarea
+          name="bad"
+          value={review.bad}
+          onChange={handleChange}
+          placeholder="아쉬웠던 점을 입력하세요"
+        />
+      </BadReview>
+      <ReviewUploadButton onClick={handleSubmit}>
+        리뷰 등록하기
+      </ReviewUploadButton>
+    </DoReviewSection>
+  );
+};
+
 const Course = () => {
+  const [isLogin] = useAtom(isLoginAtom);
   const PER_PAGE = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(dummyReviews.length / PER_PAGE);
@@ -267,7 +419,7 @@ const Course = () => {
         <LecturePic2 src="example.png"></LecturePic2>
         <LectureIntro>
           <h1>강의 정보</h1>
-          <body>간단한 강의 소개</body>
+          <div>간단한 강의 소개</div>
           <MoreInfoButton>자세히 보기</MoreInfoButton>
         </LectureIntro>
       </LectureData>
@@ -314,6 +466,21 @@ const Course = () => {
           {">"}
         </PageButton>
       </Pagination>
+      <DoReview>
+        <DoReviewInfo>
+          <h1>강의 평가하기</h1>
+          <div>강의에 대한 평가를 다른 사람들과 공유하기</div>
+        </DoReviewInfo>
+        {isLogin ? (
+          <>
+            <ReviewForm />
+          </>
+        ) : (
+          <>
+            <OnlyForUser>회원 전용 기능입니다.</OnlyForUser>
+          </>
+        )}
+      </DoReview>
       <div>코스</div>
       <Outlet />
     </>
