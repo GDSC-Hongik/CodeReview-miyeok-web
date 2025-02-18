@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { atom, useAtom } from "jotai";
 import { isLoginAtom } from "../atom";
@@ -65,21 +65,18 @@ const Button = styled(Link)`
   }
 `;
 const AuthButton = styled(Link)`
-    text-decoration: none;
-    display: flex;
-    background-color: ${(props) =>
-      props.selected ? "black" : "rgb(250,250,250)"};
-    color: ${(props) => (props.selected ? "white" : "black")};
-    align-items: center;
-    width: auto;
-    height: auto;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 15px;
-    }
-
-
-  `;
+  text-decoration: none;
+  display: flex;
+  background-color: ${(props) =>
+    props.selected ? "black" : "rgb(250,250,250)"};
+  color: ${(props) => (props.selected ? "white" : "black")};
+  align-items: center;
+  width: auto;
+  height: auto;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+`;
 
 const Input = styled.input`
   width: 40vw;
@@ -97,6 +94,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [userProfilePic, setUserProfilePic] = useAtom(userProfilePicAtom);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -122,35 +120,35 @@ const Header = () => {
     }
   }, []);
 
+  const currentPath = location.pathname + location.search;
+
   const logout = () => {
     localStorage.removeItem("authToken");
     setIsLogin(false);
     setUserProfilePic(null);
+    navigate(currentPath);
   };
 
   const handleSearch = (event) => {
     if (event.key === "Enter") {
-      navigate(`/search?query=${searchQuery}`);
+      navigate(`/course-list?query=${searchQuery}`);
     }
   };
 
-  const Auththings = [
-    { name: "Login", link: "/login" },
-    { name: "Signup", link: "/signup" },
-  ];
+  const Auththings = [{ name: "Login", link: "/login" }];
 
   return (
     <Headercss>
       <Container>
         <Logo
-          src="CodeReviewLogo.png"
+          src="/CodeReviewLogo.png"
           alt="logo"
           onClick={() => {
             navigate("/");
           }}
         />
         <Logo2
-          src="CodeReview.png"
+          src="/CodeReview.png"
           alt="logo2"
           onClick={() => {
             navigate("/");
@@ -165,9 +163,7 @@ const Header = () => {
       </Container>
       {isLogin ? (
         <Container>
-          <Button to={"/"} onClick={logout}>
-            Logout
-          </Button>
+          <Button onClick={logout}>Logout</Button>
           {userProfilePic ? (
             <UserLogo
               onClick={() => {
@@ -181,7 +177,7 @@ const Header = () => {
               onClick={() => {
                 navigate("/users");
               }}
-              src="userProfile.png"
+              src="/userProfile.png"
               alt="프로필 오류!"
             />
           )}
