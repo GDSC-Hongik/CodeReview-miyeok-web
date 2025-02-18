@@ -65,21 +65,18 @@ const Button = styled(Link)`
   }
 `;
 const AuthButton = styled(Link)`
-    text-decoration: none;
-    display: flex;
-    background-color: ${(props) =>
-      props.selected ? "black" : "rgb(250,250,250)"};
-    color: ${(props) => (props.selected ? "white" : "black")};
-    align-items: center;
-    width: auto;
-    height: auto;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 15px;
-    }
-
-
-  `;
+  text-decoration: none;
+  display: flex;
+  background-color: ${(props) =>
+    props.selected ? "black" : "rgb(250,250,250)"};
+  color: ${(props) => (props.selected ? "white" : "black")};
+  align-items: center;
+  width: auto;
+  height: auto;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+`;
 
 const Input = styled.input`
   width: 40vw;
