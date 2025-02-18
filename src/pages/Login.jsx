@@ -83,11 +83,7 @@ const Login = () => {
         <ButtonPage>
           <button className="kakao" onClick={isLogin}>
             <img src="/kakaotalk.png" className="kakaoimg" />
-            카카오 로그인
-          </button>
-          <button className="naver" onClick={isLogin}>
-            <img src="/naver.png" className="naverimg" />
-            네이버 로그인
+            구글 로그인
           </button>
         </ButtonPage>
       </LoginBody>
