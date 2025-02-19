@@ -4,9 +4,9 @@ const ReviewContainer = styled.section`
   height: 250px;
   width: 100%;
   padding: 15px;
-  border: 1px solid lightgray;
+  border: 1px solid #f6f6f6;
   border-radius: 5px;
-  background-color: #e8e8e8;
+  background-color: #f6f6f6;
   display: flex;
   align-content: center;
   gap: 10px;
@@ -53,6 +53,7 @@ const YesButton = styled.button`
   height: 20px;
   width: 50px;
   justify-content: center;
+  padding: 1px;
   border-radius: 10px;
   border: 1px solid gray;
   cursor: pointer;
@@ -67,6 +68,7 @@ const NoButton = styled.button`
   height: 20px;
   width: 80px;
   justify-content: center;
+  padding: 1px;
   border-radius: 10px;
   border: 1px solid gray;
   cursor: pointer;
@@ -77,9 +79,14 @@ const NoButton = styled.button`
   }
 `;
 
-const ReviewBox = ({ reviewer, reviewerImage, rating, comment }) => {
+const ReviewBox = ({ reviewer, reviewerImage, rating, comment, onClick }) => {
   return (
-    <ReviewContainer>
+    <ReviewContainer
+      onClick={onClick}
+      style={{
+        cursor: "pointer",
+      }}
+    >
       <UserImage src={reviewerImage} alt="Reviewer" />
       <ReviewInfo>
         <Reviewer>{reviewer}</Reviewer>
@@ -87,8 +94,12 @@ const ReviewBox = ({ reviewer, reviewerImage, rating, comment }) => {
         <ReviewText>{comment}</ReviewText>
         <ReviewReact>
           <div>해당 리뷰가 도움이 되나요?</div>
-          <YesButton>예 👍</YesButton>
-          <NoButton>아니요 👎</NoButton>
+          <YesButton>
+            예 <img src="/good.png" alt="예" width="10" />
+          </YesButton>
+          <NoButton>
+            아니요 <img src="/bad.png" alt="예" width="10" />
+          </NoButton>
         </ReviewReact>
       </ReviewInfo>
     </ReviewContainer>
