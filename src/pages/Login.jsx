@@ -1,12 +1,8 @@
 import styled from "styled-components";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-/*
-const REST_API_KEY = '백엔드한테 달라하자1';
-  const REDIRECT_URI = '백엔드한테 달라하자2';
-  const link = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-*/
 const LoginBody = styled.div`
   display: flex;
   justify-content: center;
@@ -29,11 +25,11 @@ const ButtonPage = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
+  text-align: center;
   margin-top: 16px;
   gap: 20px;
 
-  .kakao,
-  .naver {
+  .google {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,50 +41,45 @@ const ButtonPage = styled.div`
     border: none;
   }
 
-  .kakao {
-    background-color: #ffe812;
-    color: black;
-  }
-  .naver {
-    background-color: #00c73c;
-    color: white;
-  }
-
-  button .kakaoimg {
-    width: 30px;
-    margin-right: 16px;
-  }
-  button .naverimg {
-    width: 45px;
+  .google {
+    border: 2px solid #e4e4e4;
   }
 `;
 
 const Login = () => {
   const navigate = useNavigate();
+  const [authError, setAuthError] = useState(null);
 
-  const isLogin = () => {
-    const Token = "dummyToken";
-    localStorage.setItem("authToken", Token);
-    navigate("/");
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await fetch(
+        "http://13.209.165.107:8080/api/auth/google/sign-in"
+      );
+      const data = await response.json();
+      if (data.authToken) {
+        localStorage.setItem("authToken", data.authToken);
+        navigate("/signup");
+      } else {
+        setAuthError("로그인에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (err) {
+      console.error("구글 로그인 실패:", err);
+      setAuthError("로그인에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
-  /*const handleKakaoLogin = () => {
-    window.location.href = kakaoURL;
-  };*/
   return (
     <>
       <Header />
       <LoginBody>
         <div className="head">Login</div>
         <ButtonPage>
-          <button className="kakao" onClick={isLogin}>
-            <img src="/kakaotalk.png" className="kakaoimg" />
-            카카오 로그인
-          </button>
-          <button className="naver" onClick={isLogin}>
-            <img src="/naver.png" className="naverimg" />
-            네이버 로그인
-          </button>
+          <img
+            className="google"
+            src="/GoogleLogin.png"
+            onClick={handleGoogleLogin}
+          />
+          {authError && <div className="error">{authError}</div>}
         </ButtonPage>
       </LoginBody>
     </>

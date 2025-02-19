@@ -16,13 +16,14 @@ const ProductButton = styled.div`
   }
 `;
 
-const ImageButton = ({ image, link }) => {
+const ImageButton = ({ image, name }) => {
+  const courseName = name.replace(/\s+/g, "-").toLowerCase();
   return (
     <ProductButton>
       <img
         src={image}
         onClick={() => {
-          window.location.href = link;
+          window.location.href = `/course/${courseName}`;
         }}
       />
     </ProductButton>
