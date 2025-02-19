@@ -3,8 +3,10 @@ import { isLoginAtom } from "../atom";
 import { useState } from "react";
 import Header from "../components/Header.jsx";
 import ReviewBox from "../components/ReviewBox.jsx";
+import ReviewModal from "../components/ReviewModal";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
+import { useRef } from "react";
 
 const Br = styled.div`
   padding-top: 80px;
@@ -167,27 +169,10 @@ const LectureReviewIntro = styled.div`
     font-size: 24px;
   }
 
-  body {
+  div {
     font-size: 16px;
   }
 `;
-
-const RangeSelect = styled.select`
-  width: 85px;
-  height: 30px;
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid gray;
-  border-radius: 16px;
-  background-color: whitesmoke;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: whitesmoke;
-  }
-`;
-
 const LectureReview = styled.section`
   width: 80%;
   display: grid;
@@ -282,8 +267,8 @@ const ReviewTitle = styled.div`
   flex-direction: column;
   gap: 15px;
 
-  textarea {
-    height: 30px;
+  input {
+    height: 40px;
     padding: 10px;
     font-size: 16px;
   }
@@ -397,6 +382,24 @@ const Course = () => {
   const startIndex = (currentPage - 1) * PER_PAGE;
   const selectedReviews = dummyReviews.slice(startIndex, startIndex + PER_PAGE);
 
+  const reviewFormRef = useRef(null);
+
+  const scrollToReviewForm = () => {
+    if (reviewFormRef.current) {
+      reviewFormRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const [selectedReview, setSelectedReview] = useState(null);
+
+  const openReviewModal = (review) => {
+    setSelectedReview(review);
+  };
+
+  const closeReviewModal = () => {
+    setSelectedReview(null);
+  };
+
   return (
     <>
       <Header />
@@ -412,7 +415,7 @@ const Course = () => {
         </LectureInfo>
         <BookmarkAndReview>
           <BookmarkButton>즐겨찾기</BookmarkButton>
-          <ReviewButton>강의평가하기</ReviewButton>
+          <ReviewButton onClick={scrollToReviewForm}>강의평가하기</ReviewButton>
         </BookmarkAndReview>
       </LectureName>
       <LectureData>
@@ -426,12 +429,8 @@ const Course = () => {
       <LectureReviewInfo>
         <LectureReviewIntro>
           <h2>강의 리뷰</h2>
-          <body>해당 강좌에 대한 다른 리뷰어들의 평가를 둘러봐요!</body>
+          <div>해당 강좌에 대한 다른 리뷰어들의 평가를 둘러봐요!</div>
         </LectureReviewIntro>
-        <RangeSelect>
-          <option value="recommend">추천순</option>
-          <option value="latest">최신순</option>
-        </RangeSelect>
       </LectureReviewInfo>
       <LectureReview>
         {selectedReviews.map((review, index) => (
@@ -441,9 +440,14 @@ const Course = () => {
             reviewerImage={review.reviewerImage}
             rating={review.rating}
             comment={review.comment}
+            onClick={() => openReviewModal(review)}
           />
         ))}
       </LectureReview>
+
+      {selectedReview && (
+        <ReviewModal review={selectedReview} onClose={closeReviewModal} />
+      )}
 
       <Pagination>
         <PageButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>
@@ -466,7 +470,7 @@ const Course = () => {
           {">"}
         </PageButton>
       </Pagination>
-      <DoReview>
+      <DoReview ref={reviewFormRef}>
         <DoReviewInfo>
           <h1>강의 평가하기</h1>
           <div>강의에 대한 평가를 다른 사람들과 공유하기</div>
