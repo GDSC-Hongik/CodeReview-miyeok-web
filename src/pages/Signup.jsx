@@ -100,7 +100,7 @@ const Signup = () => {
         setErrorMessage("");
         navigate("/signup-complete");
       } else {
-        setErrorMessage("문제가 발생하였습니다.");
+        navigate("/signup-complete");
       }
     } catch (error) {
       setErrorMessage("서버와 통신 중 문제가 발생하였습니다.");
