@@ -267,8 +267,13 @@ const Home = () => {
 
   useEffect(() => {
     const fetchAllCourse = async () => {
+      let url = "http://13.209.165.107:8080/api/lecture";
+
+      if (category !== "ALL") {
+        url = `http://13.209.165.107:8080/api/lecture/category?category=${category}`;
+      }
       try {
-        const response = await fetch("http://13.209.165.107:8080/api/lecture");
+        const response = await fetch(url);
         const data = await response.json();
         setCourses(data);
       } catch (err) {
@@ -363,10 +368,39 @@ const Home = () => {
           {CategoryMap.map((cat) => (
             <CategoryButton
               key={cat}
-              onClick={() => {
-                handleCategoryChange(cat);
-              }}
-              selected={category === cat}
+              onClick={() =>
+                handleCategoryChange(
+                  cat === "웹 개발"
+                    ? "WEB"
+                    : cat === "모바일 개발"
+                    ? "MOBILE"
+                    : cat === "ALL"
+                    ? "ALL"
+                    : cat === "프로그래밍 언어"
+                    ? "PL"
+                    : cat === "데이터베이스"
+                    ? "DB"
+                    : cat === "소프트웨어 테스트"
+                    ? "TEST"
+                    : cat
+                )
+              }
+              selected={
+                category ===
+                (cat === "웹 개발"
+                  ? "WEB"
+                  : cat === "모바일 개발"
+                  ? "MOBILE"
+                  : cat === "ALL"
+                  ? "ALL"
+                  : cat === "프로그래밍 언어"
+                  ? "PL"
+                  : cat === "데이터베이스"
+                  ? "DB"
+                  : cat === "소프트웨어 테스트"
+                  ? "TEST"
+                  : cat)
+              }
             >
               {cat}
             </CategoryButton>
