@@ -7,6 +7,7 @@ import Course from "./pages/Course.jsx";
 import Search from "./pages/Search.jsx";
 import Users from "./pages/Users.jsx";
 import Compare from "./pages/Compare.jsx";
+import MoreAboutLecturer from "./pages/MoreAboutLecturer.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/users" element={<Users />} />
           <Route path="/compare" element={<Compare />} />
+          <Route path="/lecturer" element={<MoreAboutLecturer />} />
         </Routes>
       </BrowserRouter>
     </>
