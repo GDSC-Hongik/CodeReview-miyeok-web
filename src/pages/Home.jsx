@@ -197,41 +197,6 @@ const RecCourse = styled.div`
   }
 `;
 
-const RecAD = styled.div`
-  font-size: 30px;
-  align-items: center;
-  width: 100%;
-  display: flex;
-  gap: 40px;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 80px;
-
-  &::-webkit-scrollbar {
-    height: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  &::-webkit-scrollbar-button {
-    display: none;
-  }
-`;
-const RecThings = styled.img`
-  display: flex;
-  gap: 40px;
-  width: 480px;
-  height: 400px;
-  object-fit: cover;
-  background-color: rgb(220, 220, 220);
-  flex-shrink: 0;
-`;
-
 const NeedLogin = styled.div`
   display: flex;
   width: 100%;
@@ -256,60 +221,41 @@ const LoginButton = styled.button`
   cursor: pointer;
 `;
 
+const RecCourseImage = styled.div`
+  width: 480px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+`;
+
 const Home = () => {
   const [isLogin] = useAtom(isLoginAtom);
   const [category, setCategory] = useState("ALL");
   const [courses, setCourses] = useState([]);
-  const [ads, setAds] = useState([]);
-  const [recommandCourses, setRecommandCourses] = useState([]);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(12);
 
   useEffect(() => {
     const fetchAllCourse = async () => {
+      let url = "http://13.209.165.107:8080/api/lecture";
+
+      if (category !== "ALL") {
+        url = `http://13.209.165.107:8080/api/lecture/category?category=${category}`;
+      }
       try {
-        const response = await fetch("http://13.209.165.107:8080/api/lecture");
+        const response = await fetch(url);
         const data = await response.json();
         setCourses(data);
       } catch (err) {
         setError(err.message);
         console.error("오류:", { err });
+        console.log(error);
       }
     };
     fetchAllCourse();
-  }, []);
+  }, [category]);
 
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const response = await fetch(
-          "https://api.unsplash.com/photos?client_id=800hGr_695fPo_zAhHXStRFpytHVdjj4X2b5us6zbqI&per_page=5"
-        );
-        const data = await response.json();
-        setAds(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("오류:", { error });
-      }
-    };
-    fetchAds();
-  }, []);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch(
-          "https://api.unsplash.com/photos?client_id=800hGr_695fPo_zAhHXStRFpytHVdjj4X2b5us6zbqI&per_page=5"
-        );
-        const data = await response.json();
-        setRecommandCourses(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("오류:", { error });
-      }
-    };
-    fetchCourses();
-  }, []);
+  const AIrecommandCourses = courses.slice(0, 5);
 
   const handleCategoryChange = (newCategory) => {
     setCategory(newCategory);
@@ -363,18 +309,47 @@ const Home = () => {
           {CategoryMap.map((cat) => (
             <CategoryButton
               key={cat}
-              onClick={() => {
-                handleCategoryChange(cat);
-              }}
-              selected={category === cat}
+              onClick={() =>
+                handleCategoryChange(
+                  cat === "웹 개발"
+                    ? "WEB"
+                    : cat === "모바일 개발"
+                    ? "MOBILE"
+                    : cat === "ALL"
+                    ? "ALL"
+                    : cat === "프로그래밍 언어"
+                    ? "PL"
+                    : cat === "데이터베이스"
+                    ? "DB"
+                    : cat === "소프트웨어 테스트"
+                    ? "TEST"
+                    : cat
+                )
+              }
+              selected={
+                category ===
+                (cat === "웹 개발"
+                  ? "WEB"
+                  : cat === "모바일 개발"
+                  ? "MOBILE"
+                  : cat === "ALL"
+                  ? "ALL"
+                  : cat === "프로그래밍 언어"
+                  ? "PL"
+                  : cat === "데이터베이스"
+                  ? "DB"
+                  : cat === "소프트웨어 테스트"
+                  ? "TEST"
+                  : cat)
+              }
             >
               {cat}
             </CategoryButton>
           ))}
         </Category>
         <Course>
-          {DoubleFilteredCourses.map((courses, index) => (
-            <div key={index}>
+          {DoubleFilteredCourses.map((courses) => (
+            <div key={courses.id}>
               <ImageButton {...courses} />
               <Info
                 to={`/course/${encodeURIComponent(
@@ -399,16 +374,25 @@ const Home = () => {
       </Product>
       {isLogin ? (
         <RecFeed>
+          <div>추천강좌</div>
           <RecCourse>
-            {recommandCourses.map((cat) => (
-              <RecThings key={cat.id} src={cat.urls.regular} />
+            {AIrecommandCourses.map((course) => (
+              <div key={course.id}>
+                <RecCourseImage>
+                  <ImageButton {...course} />
+                </RecCourseImage>
+
+                <Info
+                  to={`/course/${encodeURIComponent(
+                    course.title.replace(/\s+/g, "-").toLowerCase()
+                  )}`}
+                >
+                  {course.title}
+                </Info>
+                <Instruct>{course.instructorName}</Instruct>
+              </div>
             ))}
           </RecCourse>
-          <RecAD>
-            {ads.map((cat) => (
-              <RecThings key={cat.id} src={cat.urls.regular} />
-            ))}
-          </RecAD>
         </RecFeed>
       ) : (
         <>

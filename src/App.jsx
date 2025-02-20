@@ -8,6 +8,7 @@ import CourseList from "./pages/CourseList.jsx";
 import Users from "./pages/Users.jsx";
 import Compare from "./pages/Compare.jsx";
 import SignupComplete from "./pages/SignupComplete.jsx";
+import OAuthRedirect from "./pages/oAuthRedirect.jsx";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/course-list" element={<CourseList />} />
           <Route path="/users" element={<Users />} />
           <Route path="/compare" element={<Compare />} />
+          <Route path="/oauth2/redirect" element={<OAuthRedirect />} />
         </Routes>
       </BrowserRouter>
     </>

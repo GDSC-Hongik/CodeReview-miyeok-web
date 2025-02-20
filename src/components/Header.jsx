@@ -5,7 +5,6 @@ import { atom, useAtom } from "jotai";
 import { isLoginAtom } from "../atom";
 
 const searchQueryAtom = atom("");
-const userProfilePicAtom = atom(null);
 const Headercss = styled.div`
   z-index: 1;
   border-radius: 10px;
@@ -92,40 +91,29 @@ const Input = styled.input`
 const Header = () => {
   const [isLogin, setIsLogin] = useAtom(isLoginAtom);
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
-  const [userProfilePic, setUserProfilePic] = useAtom(userProfilePicAtom);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
+    const token1 = localStorage.getItem("accessToken");
+    const token2 = localStorage.getItem("refreshToken");
+    const token3 = localStorage.getItem("email");
+    const token4 = localStorage.getItem("role");
+    if (token1 && token2 && token3 && token4) {
       setIsLogin(true);
-      const fetchProfileimg = async () => {
-        try {
-          const response = await fetch("api/user/pic", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const data = await response.json();
-          setUserProfilePic(data.profilePicUrl);
-        } catch (error) {
-          console.error("프로필 사진을 가져오는 데 실패했습니다.", error);
-        }
-      };
-      fetchProfileimg();
     } else {
       setIsLogin(false);
     }
-  }, []);
+  }, [setIsLogin]);
 
   const currentPath = location.pathname + location.search;
 
   const logout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
     setIsLogin(false);
-    setUserProfilePic(null);
     navigate(currentPath);
   };
 
@@ -164,23 +152,13 @@ const Header = () => {
       {isLogin ? (
         <Container>
           <Button onClick={logout}>Logout</Button>
-          {userProfilePic ? (
-            <UserLogo
-              onClick={() => {
-                navigate("/users");
-              }}
-              src={userProfilePic}
-              alt="프로필"
-            />
-          ) : (
-            <UserLogo
-              onClick={() => {
-                navigate("/users");
-              }}
-              src="/userProfile.png"
-              alt="프로필 오류!"
-            />
-          )}
+          <UserLogo
+            onClick={() => {
+              navigate("/users");
+            }}
+            src="/userProfile.png"
+            alt="프로필 오류!"
+          />
         </Container>
       ) : (
         <Container>

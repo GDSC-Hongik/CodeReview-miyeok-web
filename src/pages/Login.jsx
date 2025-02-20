@@ -1,7 +1,5 @@
 import styled from "styled-components";
 import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 const LoginBody = styled.div`
   display: flex;
@@ -34,7 +32,7 @@ const ButtonPage = styled.div`
     align-items: center;
     justify-content: center;
     width: 380px;
-    height: 50px;
+    height: auto;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
@@ -44,28 +42,25 @@ const ButtonPage = styled.div`
   .google {
     border: 2px solid #e4e4e4;
   }
+
+  button .kakaoimg {
+    width: 30px;
+    margin-right: 16px;
+  }
+  button .naverimg {
+    width: 45px;
+  }
 `;
-
 const Login = () => {
-  const navigate = useNavigate();
-  const [authError, setAuthError] = useState(null);
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = import.meta.env.VITE_REDIRECT_URI;
 
-  const handleGoogleLogin = async () => {
-    try {
-      const response = await fetch(
-        "http://13.209.165.107:8080/api/auth/google/sign-in"
-      );
-      const data = await response.json();
-      if (data.authToken) {
-        localStorage.setItem("authToken", data.authToken);
-        navigate("/signup");
-      } else {
-        setAuthError("로그인에 실패했습니다. 다시 시도해주세요.");
-      }
-    } catch (err) {
-      console.error("구글 로그인 실패:", err);
-      setAuthError("로그인에 실패했습니다. 다시 시도해주세요.");
-    }
+    // 구글 로그인 URL 생성 (구체적인 방식은 구글 인증에 맞게 수정)
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid email`;
+
+    // 구글 로그인 페이지로 리디렉션
+    window.location.href = googleAuthUrl;
   };
 
   return (
@@ -79,7 +74,6 @@ const Login = () => {
             src="/GoogleLogin.png"
             onClick={handleGoogleLogin}
           />
-          {authError && <div className="error">{authError}</div>}
         </ButtonPage>
       </LoginBody>
     </>
