@@ -1,12 +1,6 @@
 import styled from "styled-components";
 import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
 
-/*
-const REST_API_KEY = '백엔드한테 달라하자1';
-  const REDIRECT_URI = '백엔드한테 달라하자2';
-  const link = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-*/
 const LoginBody = styled.div`
   display: flex;
   justify-content: center;
@@ -29,29 +23,24 @@ const ButtonPage = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
+  text-align: center;
   margin-top: 16px;
   gap: 20px;
 
-  .kakao,
-  .naver {
+  .google {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 380px;
-    height: 50px;
+    height: auto;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
     border: none;
   }
 
-  .kakao {
-    background-color: #ffe812;
-    color: black;
-  }
-  .naver {
-    background-color: #00c73c;
-    color: white;
+  .google {
+    border: 2px solid #e4e4e4;
   }
 
   button .kakaoimg {
@@ -62,33 +51,29 @@ const ButtonPage = styled.div`
     width: 45px;
   }
 `;
-
 const Login = () => {
-  const navigate = useNavigate();
+  const handleGoogleLogin = () => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const redirectUri = import.meta.env.VITE_REDIRECT_URI;
 
-  const isLogin = () => {
-    const Token = "dummyToken";
-    localStorage.setItem("authToken", Token);
-    navigate("/");
+    // 구글 로그인 URL 생성 (구체적인 방식은 구글 인증에 맞게 수정)
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid email`;
+
+    // 구글 로그인 페이지로 리디렉션
+    window.location.href = googleAuthUrl;
   };
 
-  /*const handleKakaoLogin = () => {
-    window.location.href = kakaoURL;
-  };*/
   return (
     <>
       <Header />
       <LoginBody>
         <div className="head">Login</div>
         <ButtonPage>
-          <button className="kakao" onClick={isLogin}>
-            <img src="/kakaotalk.png" className="kakaoimg" />
-            카카오 로그인
-          </button>
-          <button className="naver" onClick={isLogin}>
-            <img src="/naver.png" className="naverimg" />
-            네이버 로그인
-          </button>
+          <img
+            className="google"
+            src="/GoogleLogin.png"
+            onClick={handleGoogleLogin}
+          />
         </ButtonPage>
       </LoginBody>
     </>

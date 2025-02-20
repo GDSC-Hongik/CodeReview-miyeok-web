@@ -13,16 +13,18 @@ const ProductButton = styled.div`
     height: calc(width * 0.7);
     object-fit: cover;
     border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
   }
 `;
 
-const ImageButton = ({ image, link }) => {
+const ImageButton = ({ thumbnail, title }) => {
+  const courseName = title.replace(/\s+/g, "-").toLowerCase();
   return (
     <ProductButton>
       <img
-        src={image}
+        src={thumbnail}
         onClick={() => {
-          window.location.href = link;
+          window.location.href = `/course/${courseName}`;
         }}
       />
     </ProductButton>
