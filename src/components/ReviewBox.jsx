@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import StarRating from "./StarRating";
 const ReviewContainer = styled.section`
   height: 250px;
   width: 100%;
@@ -29,8 +29,22 @@ const Reviewer = styled.div`
   font-weight: bold;
 `;
 
-const ReviewRate = styled.div`
-  font-size: 16px;
+const StarAndlike = styled.div`
+  display: flex;
+
+  .like {
+    display: flex;
+    padding-left: 10px;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .like div {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 `;
 
 const ReviewText = styled.p`
@@ -41,45 +55,15 @@ const ReviewText = styled.p`
   -webkit-box-orient: vertical;
 `;
 
-const ReviewReact = styled.div`
-  font-size: 14px;
-  display: flex;
-  gap: 15px;
-  margin-top: auto;
-  margin-bottom: 5px;
-`;
-
-const YesButton = styled.button`
-  height: 20px;
-  width: 50px;
-  justify-content: center;
-  padding: 1px;
-  border-radius: 10px;
-  border: 1px solid gray;
-  cursor: pointer;
-
-  &:hover {
-    background-color: lightgray;
-    color: black;
-  }
-`;
-
-const NoButton = styled.button`
-  height: 20px;
-  width: 80px;
-  justify-content: center;
-  padding: 1px;
-  border-radius: 10px;
-  border: 1px solid gray;
-  cursor: pointer;
-
-  &:hover {
-    background-color: lightgray;
-    color: black;
-  }
-`;
-
-const ReviewBox = ({ reviewer, reviewerImage, rating, comment, onClick }) => {
+const ReviewBox = ({
+  reviewer,
+  reviewerImage,
+  rating,
+  comment,
+  onClick,
+  like,
+  hate,
+}) => {
   return (
     <ReviewContainer
       onClick={onClick}
@@ -90,17 +74,20 @@ const ReviewBox = ({ reviewer, reviewerImage, rating, comment, onClick }) => {
       <UserImage src={reviewerImage} alt="Reviewer" />
       <ReviewInfo>
         <Reviewer>{reviewer}</Reviewer>
-        <ReviewRate>⭐ {rating}</ReviewRate>
+        <StarAndlike>
+          <StarRating rate={rating} />
+          <div className="like">
+            <div>
+              <img src="/good.png" alt="예" width="10" />
+              {like}
+            </div>
+            <div>
+              <img src="/bad.png" alt="예" width="10" />
+              {hate}
+            </div>
+          </div>
+        </StarAndlike>
         <ReviewText>{comment}</ReviewText>
-        <ReviewReact>
-          <div>해당 리뷰가 도움이 되나요?</div>
-          <YesButton>
-            예 <img src="/good.png" alt="예" width="10" />
-          </YesButton>
-          <NoButton>
-            아니요 <img src="/bad.png" alt="예" width="10" />
-          </NoButton>
-        </ReviewReact>
       </ReviewInfo>
     </ReviewContainer>
   );

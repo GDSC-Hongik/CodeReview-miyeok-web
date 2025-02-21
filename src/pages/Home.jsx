@@ -150,7 +150,7 @@ const Info = styled(Link)`
   text-decoration: none;
 `;
 
-const Instruct = styled.a`
+const Instruct = styled(Link)`
   display: flex;
   padding-top: 10px;
   color: gray;
@@ -253,7 +253,7 @@ const Home = () => {
       }
     };
     fetchAllCourse();
-  }, [category]);
+  }, [error]);
 
   const AIrecommandCourses = courses.slice(0, 5);
 
@@ -283,7 +283,6 @@ const Home = () => {
     "프로그래밍 언어",
     "데이터베이스",
     "소프트웨어 테스트",
-    "WEB",
   ];
 
   return (
@@ -351,14 +350,14 @@ const Home = () => {
           {DoubleFilteredCourses.map((courses) => (
             <div key={courses.id}>
               <ImageButton {...courses} />
-              <Info
-                to={`/course/${encodeURIComponent(
-                  courses.title.replace(/\s+/g, "-").toLowerCase()
-                )}`}
-              >
+              <Info to={`/course/${encodeURIComponent(courses.title)}`}>
                 {courses.title}
               </Info>
-              <Instruct>{courses.instructorName}</Instruct>
+              <Instruct
+                to={`/lecturer/${encodeURIComponent(courses.instructorName)}`}
+              >
+                {courses.instructorName}
+              </Instruct>
             </div>
           ))}
         </Course>
@@ -382,14 +381,14 @@ const Home = () => {
                   <ImageButton {...course} />
                 </RecCourseImage>
 
-                <Info
-                  to={`/course/${encodeURIComponent(
-                    course.title.replace(/\s+/g, "-").toLowerCase()
-                  )}`}
-                >
+                <Info to={`/course/${encodeURIComponent(course.title)}`}>
                   {course.title}
                 </Info>
-                <Instruct>{course.instructorName}</Instruct>
+                <Instruct
+                  to={`/lecturer/${encodeURIComponent(course.instructorName)}`}
+                >
+                  {course.instructorName}
+                </Instruct>
               </div>
             ))}
           </RecCourse>

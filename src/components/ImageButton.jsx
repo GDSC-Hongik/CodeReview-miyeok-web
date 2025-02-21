@@ -18,7 +18,7 @@ const ProductButton = styled.div`
 `;
 
 const ImageButton = ({ thumbnail, title }) => {
-  const courseName = title.replace(/\s+/g, "-").toLowerCase();
+  const courseName = encodeURIComponent(title);
   return (
     <ProductButton>
       <img

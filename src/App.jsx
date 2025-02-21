@@ -6,10 +6,9 @@ import Signup from "./pages/Signup.jsx";
 import Course from "./pages/Course.jsx";
 import CourseList from "./pages/CourseList.jsx";
 import Users from "./pages/Users.jsx";
-import Compare from "./pages/Compare.jsx";
 import SignupComplete from "./pages/SignupComplete.jsx";
 import OAuthRedirect from "./pages/oAuthRedirect.jsx";
-
+import MoreAboutLecturer from "./pages/MoreAboutLecturer.jsx";
 function App() {
   return (
     <>
@@ -21,9 +20,9 @@ function App() {
           <Route path="/signup-complete" element={<SignupComplete />} />
           <Route path="/course/:courseName" element={<Course />} />
           <Route path="/course-list" element={<CourseList />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/compare" element={<Compare />} />
+          <Route path="/users/:userId" element={<Users />} />
           <Route path="/oauth2/redirect" element={<OAuthRedirect />} />
+          <Route path="/lecturer/:lectureId" element={<MoreAboutLecturer />} />
         </Routes>
       </BrowserRouter>
     </>

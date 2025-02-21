@@ -323,7 +323,7 @@ const CourseList = () => {
       }
     };
     fetchAllCourse();
-  }, []);
+  }, [error]);
 
   useEffect(() => {
     if (selectedCourses.length === 2) {
@@ -409,7 +409,7 @@ const CourseList = () => {
       <Header />
       <ListBody>
         <Between>
-          <div className="searchquery"> &quot{query}&quot 검색결과</div>
+          <div className="searchquery"> &quot; {query} &quot; 검색결과</div>
           <div className="right">
             <div>{selectedCourses.length}/2</div>
             <CompareButton
