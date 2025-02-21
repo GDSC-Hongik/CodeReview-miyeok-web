@@ -56,10 +56,8 @@ const Login = () => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_REDIRECT_URI;
 
-    // 구글 로그인 URL 생성 (구체적인 방식은 구글 인증에 맞게 수정)
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid email`;
 
-    // 구글 로그인 페이지로 리디렉션
     window.location.href = googleAuthUrl;
   };
 

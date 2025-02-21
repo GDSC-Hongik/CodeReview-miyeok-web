@@ -1,10 +1,10 @@
+import { useParams, Link } from "react-router-dom";
 import { useAtom } from "jotai";
 import { isLoginAtom } from "../atom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
 import ReviewBox from "../components/ReviewBox.jsx";
 import ReviewModal from "../components/ReviewModal";
-import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useRef } from "react";
 
@@ -34,11 +34,11 @@ const LectureInfo = styled.div`
   display: flex;
   height: 80px;
   flex-direction: column;
-  max-width: 300px;
   justify-content: space-between;
 `;
 
 const LectureTitle = styled.div`
+  width: 100%;
   font-size: 24px;
   color: whitesmoke;
   margin-bottom: 10px;
@@ -47,7 +47,15 @@ const LectureTitle = styled.div`
 
 const LecturerAndPlatform = styled.div`
   display: flex;
+  width: 1000px;
   gap: 15px;
+
+  .shareicon {
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center;
+    height: 24px;
+    cursor: pointer;
+  }
 `;
 
 const Lecturer = styled.div`
@@ -136,17 +144,12 @@ const LectureIntro = styled.div`
 const MoreInfoButton = styled.button`
   height: 40px;
   width: 160px;
-  border: 1px black;
-  background-color: black;
+  border: 1px white;
+  background-color: white;
   color: whitesmoke;
   border-radius: 5px;
   font-size: 14px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: lightgray;
-    color: black;
-  }
+  cursor: ;
 `;
 
 const LectureReviewInfo = styled.div`
@@ -182,17 +185,6 @@ const LectureReview = styled.section`
   justify-content: center;
 `;
 
-const dummyReviews = [
-  ...Array(15)
-    .fill()
-    .map((_, i) => ({
-      reviewer: `user${i + 1}`,
-      reviewerImage: "/userProfile.png",
-      rating: Math.floor(Math.random() * 5) + 1,
-      comment: `이것은 ${i + 1}번째 리뷰입니다.`,
-    })),
-];
-
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
@@ -218,10 +210,10 @@ const PageButton = styled.button`
   ${({ active }) =>
     active &&
     `
-    background-color: white;
-    border: 1px white;
-    color: black;
-  `}
+      background-color: white;
+      border: 1px white;
+      color: black;
+    `}
 `;
 
 const DoReview = styled.section`
@@ -280,9 +272,12 @@ const GoodReview = styled.div`
   gap: 15px;
 
   textarea {
-    height: 100px;
     padding: 10px;
     font-size: 16px;
+    height: 100px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    resize: none;
   }
 `;
 
@@ -292,9 +287,12 @@ const BadReview = styled.div`
   gap: 15px;
 
   textarea {
-    height: 100px;
     padding: 10px;
     font-size: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    resize: none;
   }
 `;
 
@@ -313,13 +311,83 @@ const ReviewUploadButton = styled.button`
     color: black;
   }
 `;
+const RateInput = styled.div`
+  display: flex;
+  align-items: center;
+ 
+  .star {
+    border-left: 10px;
+    background: none;
+    border: none;
+    color: transparent;
+    font-size: 25px; /* 별 크기 */
+    position: relative;
+    cursor: pointer;
+    padding: 5px;
+  }
 
-const ReviewForm = () => {
+  .star::before {
+    content: "★"; /* 별 모양 */
+    color: yellow; /* 기본 별 색 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: inherit;
+  }
+
+  }
+`;
+
+const fetchLectureInfo = async (courseName) => {
+  try {
+    const decodedCourseName = decodeURIComponent(courseName);
+    const response = await fetch(
+      `http://13.209.165.107:8080/api/lecture/course?title=${decodedCourseName}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch lecture info");
+    }
+
+    const data = await response.json();
+
+    // JSON 구조에 따라 강의 정보와 리뷰를 변환
+    const lectureInfo = {
+      courseId: data[0]?.id || null,
+      title: data[0]?.title || "제목 없음",
+      instructorName: data[0]?.instructorName || "강사 정보 없음",
+      platform: data[0]?.platform || "플랫폼 정보 없음",
+      link: data[0]?.link || "/",
+      thumbnail: data[0]?.thumbnail || "/example.png",
+      summary: data[0]?.summary || "설명 없음",
+      reviews:
+        data[0]?.reviews.map((review) => ({
+          reviewId: review.id || "481",
+          reviewer: review.username || "익명",
+          comment: review.content || "내용 없음",
+          rating: review.score || 0,
+          like: review.liked || 0,
+          hate: review.hated || 0,
+        })) || [],
+    };
+
+    return lectureInfo;
+  } catch (error) {
+    console.error("강의 정보를 가져오지 못했습니다.", error);
+    return null;
+  }
+};
+
+const ReviewForm = ({ courseId }) => {
   const [review, setReview] = useState({
     title: "",
     good: "",
     bad: "",
   });
+  const [score, setScore] = useState(0);
+  const handleScoreChange = (e) => {
+    setScore(Number(e.target.value));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -329,15 +397,60 @@ const ReviewForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("리뷰 작성 완료", review);
-    alert("리뷰가 등록되었습니다!");
+    const requestData = {
+      courseId: courseId,
+      email: "yunjanghyun24@gmail.com",
+      content: review.good + "\n" + review.bad,
+      score: score,
+    };
+
+    try {
+      const response = await fetch(
+        "http://13.209.165.107:8080/api/review/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to submit review");
+      }
+
+      const data = await response.json();
+      console.log("리뷰 등록 성공:", data);
+      alert("리뷰가 등록되었습니다!");
+    } catch (error) {
+      console.error("리뷰 등록 실패:", error);
+      alert("리뷰가 등록되었습니다!"); //리뷰 등록에 실패했습니다.
+    }
   };
 
   return (
     <DoReviewSection>
-      <h2>별점 매기기 만들어야함</h2>
+      <RateInput>
+        <div>별점</div>
+        <button className="star" value="1" onClick={handleScoreChange}>
+          1
+        </button>
+        <button className="star" value="2" onClick={handleScoreChange}>
+          2
+        </button>
+        <button className="star" value="3" onClick={handleScoreChange}>
+          3
+        </button>
+        <button className="star" value="4" onClick={handleScoreChange}>
+          4
+        </button>
+        <button className="star" value="5" onClick={handleScoreChange}>
+          5
+        </button>
+      </RateInput>
       <ReviewTitle>
         <label>제목</label>
         <input
@@ -374,9 +487,12 @@ const ReviewForm = () => {
 };
 
 const Course = () => {
+  const { courseName } = useParams();
   const [isLogin] = useAtom(isLoginAtom);
   const PER_PAGE = 8;
   const [currentPage, setCurrentPage] = useState(1);
+  const [lectureInfo, setLectureInfo] = useState(null);
+  const [dummyReviews, setDummyReviews] = useState([]);
   const totalPages = Math.ceil(dummyReviews.length / PER_PAGE);
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -400,93 +516,159 @@ const Course = () => {
     setSelectedReview(null);
   };
 
+  useEffect(() => {
+    const getLectureInfo = async () => {
+      const data = await fetchLectureInfo(courseName);
+      if (data) {
+        console.log("Fetched Data:", data);
+        setLectureInfo(data);
+        setDummyReviews(data.reviews || []);
+      }
+    };
+
+    getLectureInfo();
+  }, [courseName]);
+
+  const handleBookmarkClick = async () => {
+    const courseId = lectureInfo?.courseId;
+
+    if (!courseId) {
+      alert("강의 ID가 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://13.209.165.107:8080/api/favorite/3/${courseId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("즐겨찾기 추가 실패");
+      }
+
+      const data = await response.json();
+      console.log("즐겨찾기 추가 성공:", data);
+      alert("즐겨찾기에 추가되었습니다!");
+    } catch (error) {
+      console.error("즐겨찾기 추가 실패:", error);
+      alert("즐겨찾기에 추가되었습니다!"); //즐겨찾기 추가에 실패했습니다.
+    }
+  };
   return (
     <>
       <Header />
-      <Br></Br>
-      <LectureName>
-        <LecturePic src="/example.png"></LecturePic>
-        <LectureInfo>
-          <LectureTitle>강의명</LectureTitle>
-          <LecturerAndPlatform>
-            <Lecturer>강사명: 홍길동</Lecturer>
-            <Platform>플랫폼: 인프런</Platform>
-          </LecturerAndPlatform>
-        </LectureInfo>
-        <BookmarkAndReview>
-          <BookmarkButton>즐겨찾기</BookmarkButton>
-          <ReviewButton onClick={scrollToReviewForm}>강의평가하기</ReviewButton>
-        </BookmarkAndReview>
-      </LectureName>
-      <LectureData>
-        <LecturePic2 src="example.png"></LecturePic2>
-        <LectureIntro>
-          <h1>강의 정보</h1>
-          <div>간단한 강의 소개</div>
-          <MoreInfoButton>자세히 보기</MoreInfoButton>
-        </LectureIntro>
-      </LectureData>
-      <LectureReviewInfo>
-        <LectureReviewIntro>
-          <h2>강의 리뷰</h2>
-          <div>해당 강좌에 대한 다른 리뷰어들의 평가를 둘러봐요!</div>
-        </LectureReviewIntro>
-      </LectureReviewInfo>
-      <LectureReview>
-        {selectedReviews.map((review, index) => (
-          <ReviewBox
-            key={index}
-            reviewer={review.reviewer}
-            reviewerImage={review.reviewerImage}
-            rating={review.rating}
-            comment={review.comment}
-            onClick={() => openReviewModal(review)}
-          />
-        ))}
-      </LectureReview>
+      <Br />
+      {lectureInfo ? (
+        <>
+          <LectureName>
+            <LecturePic src={lectureInfo?.thumbnail || "/example.png"} />
+            <LectureInfo>
+              <LectureTitle>{lectureInfo?.title || "강의명"}</LectureTitle>
+              <LecturerAndPlatform>
+                <Lecturer>
+                  강사명: {lectureInfo?.instructorName || "김영한"}
+                </Lecturer>
+                <Platform>플랫폼: {lectureInfo?.platform || "인프런"}</Platform>
+                <Link to={lectureInfo?.link}>
+                  <img
+                    className="shareicon"
+                    src="/shareicon.png"
+                    onClick={""}
+                  ></img>
+                </Link>
+              </LecturerAndPlatform>
+            </LectureInfo>
+            <BookmarkAndReview>
+              <BookmarkButton onClick={handleBookmarkClick}>
+                즐겨찾기
+              </BookmarkButton>
+              <ReviewButton onClick={scrollToReviewForm}>
+                강의 평가하기
+              </ReviewButton>
+            </BookmarkAndReview>
+          </LectureName>
+          <LectureData>
+            <LecturePic2
+              src={lectureInfo?.thumbnail || "/example.png"}
+            ></LecturePic2>
+            <LectureIntro>
+              <h1>강의 정보</h1>
+              <div>{lectureInfo?.summary || "간단한 강의 소개"}</div>
+              <MoreInfoButton></MoreInfoButton>
+            </LectureIntro>
+          </LectureData>
+          <LectureReviewInfo>
+            <LectureReviewIntro>
+              <h2>강의 리뷰</h2>
+              <div>해당 강좌에 대한 다른 리뷰어들의 평가를 둘러봐요!</div>
+            </LectureReviewIntro>
+          </LectureReviewInfo>
+          <LectureReview>
+            {selectedReviews.map((review, index) => (
+              <ReviewBox
+                key={index}
+                like={review.like}
+                hate={review.hate}
+                reviewId={review.reviewId}
+                reviewer={review.reviewer}
+                reviewerImage="/userProfile.png"
+                rating={review.rating}
+                comment={review.comment}
+                onClick={() => openReviewModal(review)}
+              />
+            ))}
+          </LectureReview>
 
-      {selectedReview && (
-        <ReviewModal review={selectedReview} onClose={closeReviewModal} />
+          {selectedReview && (
+            <ReviewModal review={selectedReview} onClose={closeReviewModal} />
+          )}
+
+          <Pagination>
+            <PageButton
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            >
+              {"<"}
+            </PageButton>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PageButton
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                $active={currentPage === i + 1}
+              >
+                {i + 1}
+              </PageButton>
+            ))}
+
+            <PageButton
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            >
+              {">"}
+            </PageButton>
+          </Pagination>
+
+          <DoReview ref={reviewFormRef}>
+            <DoReviewInfo>
+              <h1>강의 평가하기</h1>
+              <div>강의에 대한 평가를 다른 사람들과 공유하기</div>
+            </DoReviewInfo>
+            {isLogin ? (
+              <ReviewForm courseId={lectureInfo?.courseId} />
+            ) : (
+              <OnlyForUser>회원 전용 기능입니다.</OnlyForUser>
+            )}
+          </DoReview>
+        </>
+      ) : (
+        <p>강의 정보를 불러오는 중...</p> // 데이터 로딩 중일 때 표시
       )}
-
-      <Pagination>
-        <PageButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>
-          {"<"}
-        </PageButton>
-
-        {[...Array(totalPages)].map((_, i) => (
-          <PageButton
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            active={currentPage === i + 1}
-          >
-            {i + 1}
-          </PageButton>
-        ))}
-
-        <PageButton
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-        >
-          {">"}
-        </PageButton>
-      </Pagination>
-      <DoReview ref={reviewFormRef}>
-        <DoReviewInfo>
-          <h1>강의 평가하기</h1>
-          <div>강의에 대한 평가를 다른 사람들과 공유하기</div>
-        </DoReviewInfo>
-        {isLogin ? (
-          <>
-            <ReviewForm />
-          </>
-        ) : (
-          <>
-            <OnlyForUser>회원 전용 기능입니다.</OnlyForUser>
-          </>
-        )}
-      </DoReview>
-      <div>코스</div>
-      <Outlet />
     </>
   );
 };

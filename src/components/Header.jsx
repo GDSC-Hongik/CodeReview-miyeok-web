@@ -154,7 +154,7 @@ const Header = () => {
           <Button onClick={logout}>Logout</Button>
           <UserLogo
             onClick={() => {
-              navigate("/users");
+              navigate("/users/3");
             }}
             src="/userProfile.png"
             alt="프로필 오류!"
